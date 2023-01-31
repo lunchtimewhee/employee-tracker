@@ -12,7 +12,7 @@ Role.init(
             autoIncrement: true,
         },
         title:{
-            type: DataTypes.VARCHAR(30),
+            type: DataTypes.STRING(30),
             allowNull: false,
         },
         salary:{
@@ -21,7 +21,7 @@ Role.init(
         },
         department_id:{
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references:{
                 model:'department',
                 key:'id'
@@ -30,10 +30,10 @@ Role.init(
     },
     {
         sequelize,
-        freezeTableName: true,
-        underscored: true,
+        freezeTableName:true,
         modelName: 'role',
     }
+    
 );
 
 module.exports = Role;
