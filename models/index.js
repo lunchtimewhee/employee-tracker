@@ -1,6 +1,7 @@
 const Department = require('./Department');
-const Employee = require('./Employee');
 const Role = require('./Role');
+const Employee = require('./Employee');
+
 
 Department.hasMany(Role, {
     foreignKey: 'department_id',
@@ -20,15 +21,17 @@ Employee.belongsTo(Role, {
 });
 
 Employee.hasOne(Employee, {
+    as: 'manager',
     foreignKey:'manager_id',
 });
 
 Employee.belongsTo(Employee, {
+    as: 'employee',
     foreignKey:'manager_id'
 });
 
 module.exports = {
     Department,
-    Employee,
-    Role
+    Role,
+    Employee
 };

@@ -12,11 +12,11 @@ Employee.init(
             autoIncrement: true,
         },
         first_name:{
-            type: DataTypes.VARCHAR(30),
+            type: DataTypes.STRING(30),
             allowNull: false,
         },
         last_name:{
-            type: DataTypes.VARCHAR(30),
+            type: DataTypes.STRING(30),
             allowNull: false,
         },
         role_id:{
@@ -29,7 +29,7 @@ Employee.init(
         },
         manager_id:{
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references:{
                 model: 'employee',
                 key:'id'
@@ -38,8 +38,7 @@ Employee.init(
     },
     {
         sequelize,
-        freezeTableName: true,
-        underscored: true,
+        freezeTableName:true,
         modelName: 'employee',
     }
 );
