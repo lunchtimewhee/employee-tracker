@@ -22,19 +22,40 @@ const mainMenuQuestions = [
 const askQuestions = async function () {
     const answers = await inquirer.prompt(mainMenuQuestions);
 
+    // If menu choice was Quit, exit the program
     if (answers.mainMenuChoice === 'Quit') {
         return answers;
-    } else {
+    } 
+
+    // Go through each choice and run the appropriate function
+    else {
         
         switch(answers.mainMenuChoice){
             case 'View All Employees':
                 await getEmployee();
                 break;
+            case 'View All Roles':
+                await getRole();
+                break;
+            case 'View All Employees':
+                await getEmployee();
+                break;
+            case 'View All Employees':
+                await getEmployee();
+                break;
+            case 'View All Employees':
+                await getEmployee();
+                break;
+            case 'View All Employees':
+                await getEmployee();
+                break;
+            case 'View All Employees':
+                await getEmployee();
+                break;
 
         };
-
         
-        return askQuestions;
+        return await askQuestions();
     };
 };
 
@@ -91,7 +112,8 @@ const getDepartment = async function() {
     const departmentList = await Department.findAll({
         raw: true,
     });
-    console.log(JSON.stringify(departmentList,null,2));
+
+    console.table(departmentList);
 }
 
 const createDepartment = async function() {
@@ -112,7 +134,8 @@ const getRole = async function() {
     const roleList = await Role.findAll({
         raw: true,
     });
-    console.log(JSON.stringify(roleList,null,2));
+
+    console.table(roleList);
 }
 
 const createEmployee = async function() {
