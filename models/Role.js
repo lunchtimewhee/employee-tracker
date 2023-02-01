@@ -14,6 +14,7 @@ Role.init(
         title:{
             type: DataTypes.STRING(30),
             allowNull: false,
+            unique: true,
         },
         salary:{
             type: DataTypes.DECIMAL,
