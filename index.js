@@ -147,13 +147,21 @@ const getEmployee = async function() {
 
 // Create a new Employee and add it to the database
 const createEmployee = async function(newFirstName, newLastName, newRoleId, newManagerId) {
-    const newRole = await Employee.create({
-        first_name: newFirstName,
-        last_name: newLastName,
-        role_id: newRoleId,
-        manager_id: newManagerId
-
-    });
+    if(newManagerId){
+        const newRole = await Employee.create({
+            first_name: newFirstName,
+            last_name: newLastName,
+            role_id: newRoleId,
+            manager_id: newManagerId
+    
+        });
+    } else {
+        const newRole = await Employee.create({
+            first_name: newFirstName,
+            last_name: newLastName,
+            role_id: newRoleId
+        });
+    };
 };
 
 // Update an Employee's role
@@ -274,6 +282,9 @@ const mainMenuQuestions = [
             display = false;
             await getEmployee(); 
             display = true;
+            if(activeEmployeeList.length === 0){
+                activeEmployeeList.push({name: 'N/A', value: null});
+            }
             return activeEmployeeList
         },
         when: (answers) => { 
