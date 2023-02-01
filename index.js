@@ -3,29 +3,12 @@ const inquirer = require('inquirer');
 const { Department, Employee, Role } = require('./models');
 const sequelize = require('./config/connection');
 const { create } = require('./models/Department');
+const { json } = require('body-parser');
+
+let activeDepartmentList = [];
 
 
 
-// Question Arrays ----------------------------------------------------------------------------
-
-// Array for main menu
-const mainMenuQuestions = [
-    {
-        type: 'list',
-        message: 'What would you like to do? ',
-        choices: ['View All Employees','Add Employees','Update Employee Role','View All Roles','Add Role', 'View All Departments', 'Add Department', 'Quit'],
-        name: 'mainMenuChoice'
-    },
-    {
-        type: 'input',
-        message: 'Enter new department name: ',
-        when: (answers) => { 
-            return answers.mainMenuChoice === 'Add Department'
-        },
-        name: 'departmentName'
-    }
-
-];
 
 
 // Function to ask inquirer questions and call functions based on the answers given
@@ -53,8 +36,8 @@ const askQuestions = async function () {
             case 'Add Department':
                 await createDepartment(answers.departmentName);
                 break;
-            case 'View All Employees':
-                await getEmployee();
+            case 'Add Role':
+                await createRole(answers.roleName, answers.roleSalary, answers.roleDepartment);
                 break;
             case 'View All Employees':
                 await getEmployee();
@@ -123,21 +106,30 @@ const getDepartment = async function() {
         raw: true,
     });
 
-    console.table(departmentList);
+    // Create a list of departments that will be returned to be used in the inquirer prompt
+    departmentList.forEach((dep) => {
+        dep.value = dep.id;
+    });
+
+    activeDepartmentList = departmentList;
 }
 
 const createDepartment = async function(newName) {
     const newDepartment = await Department.create({
         name: newName,
     })
+
+    console.log(`\nAdded ${newName} to the database. \n`)
 }
 
-const createRole = async function() {
+const createRole = async function(newTitle, newSalary, newDepartmentId) {
     const newRole = await Role.create({
-        title: 'engineer',
-        salary: 100000,
-        department_id: 1
+        title: newTitle,
+        salary: newSalary,
+        department_id: newDepartmentId
     })
+
+    console.log(`\nAdded ${newTitle} to the database. \n`)
 }
 
 const getRole = async function() {
@@ -174,6 +166,64 @@ const getEmployee = async function() {
     console.table(employeeList);
 }
 
+
+// Question Arrays ----------------------------------------------------------------------------
+
+// Array for main menu
+const mainMenuQuestions = [
+    {
+        type: 'list',
+        message: 'What would you like to do? ',
+        choices: ['View All Employees','Add Employees','Update Employee Role','View All Roles','Add Role', 'View All Departments', 'Add Department', 'Quit'],
+        name: 'mainMenuChoice'
+    },
+    {
+        type: 'input',
+        message: 'Enter new department name: ',
+        when: (answers) => { 
+            return answers.mainMenuChoice === 'Add Department'
+        },
+        name: 'departmentName'
+    },
+    {
+        type: 'input',
+        message: 'Enter new role name: ',
+        when: (answers) => { 
+            return answers.mainMenuChoice === 'Add Role'
+        },
+        name: 'roleName'
+    },
+    {
+        type: 'input',
+        message: 'Enter new role salary amount: ',
+        when: (answers) => { 
+            return answers.mainMenuChoice === 'Add Role'
+        },
+        name: 'roleSalary',
+        validate: function(input) {
+            const done = this.async();
+
+            if(!/^[0-9].+$/.test(input)) {
+                done('Please provide a valid office number', false);
+                return;
+            };
+
+            done(null, true);
+        }   
+    },
+    {
+        type: 'list',
+        message: 'Select the department that the role will belong to: ',
+        choices: async () => {await getDepartment(); return activeDepartmentList},
+        when: (answers) => { 
+            return answers.mainMenuChoice === 'Add Role'
+        },
+        name: 'roleDepartment'
+        
+    },
+
+];
+
 //syncTables();
 const seedData = async function() {
     /*await createDepartment();
@@ -188,3 +238,9 @@ const seedData = async function() {
 
 //seedData();
 askQuestions();
+//const test = async ()=>{await getDepartment();console.log(activeDepartmentList);};
+//test();
+
+
+
+
