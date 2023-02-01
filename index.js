@@ -24,7 +24,7 @@ const askQuestions = async function () {
 
     // If menu choice was Quit, exit the program
     if (answers.mainMenuChoice === 'Quit') {
-        return answers;
+        return ;
     } 
 
     // Go through each choice and run the appropriate function
@@ -37,8 +37,8 @@ const askQuestions = async function () {
             case 'View All Roles':
                 await getRole();
                 break;
-            case 'View All Employees':
-                await getEmployee();
+            case 'View All Departments':
+                await getDepartment();
                 break;
             case 'View All Employees':
                 await getEmployee();
