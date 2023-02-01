@@ -20,6 +20,8 @@ CLI app that allows you to add/update/view the departments/roles/employees of a 
 2. Run the index.js file via Node.js
 
 ## Usage Information
+Video: https://app.castify.com/watch/0e987475-3900-4bd7-8aca-1c09848a44b5
+
 1. Add Department:
 ![step1](./images/step0.JPG)
 
