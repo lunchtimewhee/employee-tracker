@@ -5,10 +5,10 @@ const sequelize = require('./config/connection');
 const { create } = require('./models/Department');
 const { json } = require('body-parser');
 
-let activeDepartmentList = [];
-let activeRoleList = [];
-let activeEmployeeList = [];
-let display = true;
+let activeDepartmentList = []; // Holds the saved down Department list
+let activeRoleList = []; // Holds the save down Role list
+let activeEmployeeList = []; // Holds the saved down Employee list
+let display = true; // Boolean to determine whether or not to display tables in the console log
 
 
 
@@ -44,64 +44,23 @@ const askQuestions = async function () {
             case 'Add Employee':
                 await createEmployee(answers.employeeFirstName, answers.employeeLastName, answers.employeeRole, answers.employeeManager);
                 break;
-            case 'View All Employees':
-                await getEmployee();
+            case 'Update Employee Role':
+                await updateEmployeeRole(answers.employeeRoleUpdateName,answers.employeeRoleUpdateRole);
                 break;
 
         };
         
+        // Go back to the main menu until Quit is chosen
         return await askQuestions();
     };
 };
 
 
-
-// Array for base Employee questions
-const employeeQuestions = [
-    {
-        type: 'input',
-        message: 'Name: ',
-        name: 'name',
-        // Check if valid name
-        validate: function(input) {
-            const done = this.async();
-
-            if(/^[0-9]+$/.test(input)) {
-                done('Please provide a valid name', false);
-                return;
-            };
-
-            done(null, true);
-        }       
-    },
-    {
-        type: 'input',
-        message: 'Email: ',
-        name: 'email',       
-        // Check if valid email
-        validate: function(input) {
-            const done = this.async();
-
-            if(!input.trim().length || !input.includes('@')) {
-                done('Please provide a valid email');
-                return;
-            };
-
-            done(null, true);
-        }
-    },
-    {
-        type:'list',
-        message: 'Employee Role: ',
-        choices: ['Engineer','Intern','Manager'],
-        name: 'employeeRole'
-    },  
-];
-
 // Sync tables
 const syncTables = async function() {
     await sequelize.sync();
 };
+
 
 // Return a list of all departments
 const getDepartment = async function() {
@@ -194,8 +153,26 @@ const createEmployee = async function(newFirstName, newLastName, newRoleId, newM
         role_id: newRoleId,
         manager_id: newManagerId
 
-    })
-}
+    });
+};
+
+// Update an Employee's role
+const updateEmployeeRole = async function(id, newRoleId) {
+    
+    // Search for the employee to update
+    const employeeToUpdate = await Employee.findByPk(id);
+
+    // Set the role_id to the new role_id
+    employeeToUpdate.set({
+        role_id: newRoleId,
+    });
+
+    // Save the update
+    await employeeToUpdate.save();
+
+    console.log(`${employeeToUpdate.first_name} ${employeeToUpdate.last_name}'s role has been updated!`);
+
+};
 
 
 
@@ -305,29 +282,47 @@ const mainMenuQuestions = [
         name: 'employeeManager'
         
     },
+    {
+        type: 'list',
+        message: `Select the employee for which you want to change their role: `,
+        choices: async () => {
+            display = false;
+            await getEmployee(); 
+            display = true;
+            return activeEmployeeList
+        },
+        when: (answers) => { 
+            return answers.mainMenuChoice === 'Update Employee Role'
+        },
+        name: 'employeeRoleUpdateName'
+        
+    },
+    {
+        type: 'list',
+        message: `Select the employee's new role: `,
+        choices: async () => {
+            display = false; 
+            await getRole(); 
+            display = true;
+            return activeRoleList
+        },
+        when: (answers) => { 
+            return answers.mainMenuChoice === 'Update Employee Role'
+        },
+        name: 'employeeRoleUpdateRole'
+        
+    },
+    
 
 ];
 
-
-const seedData = async function() {
-    /*await createDepartment();
-    await getDepartment();
-    await createRole();
-    await getRole();
-    await createEmployee();
-    await createEmployee();
-    await createManager();*/
-    await getEmployee();
-}
-
-//seedData();
+// init function
 const init = async function() {
-    syncTables();
+    await syncTables();
     await askQuestions();
 }
 
-//const test = async ()=>{await getDepartment();console.log(activeDepartmentList);};
-//test();
+init();
 
 
 
