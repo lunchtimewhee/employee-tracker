@@ -11,14 +11,24 @@ const { create } = require('./models/Department');
 // Array for main menu
 const mainMenuQuestions = [
     {
-        type:'list',
+        type: 'list',
         message: 'What would you like to do? ',
         choices: ['View All Employees','Add Employees','Update Employee Role','View All Roles','Add Role', 'View All Departments', 'Add Department', 'Quit'],
         name: 'mainMenuChoice'
+    },
+    {
+        type: 'input',
+        message: 'Enter new department name: ',
+        when: (answers) => { 
+            return answers.mainMenuChoice === 'Add Department'
+        },
+        name: 'departmentName'
     }
+
 ];
 
 
+// Function to ask inquirer questions and call functions based on the answers given
 const askQuestions = async function () {
     const answers = await inquirer.prompt(mainMenuQuestions);
 
@@ -40,8 +50,8 @@ const askQuestions = async function () {
             case 'View All Departments':
                 await getDepartment();
                 break;
-            case 'View All Employees':
-                await getEmployee();
+            case 'Add Department':
+                await createDepartment(answers.departmentName);
                 break;
             case 'View All Employees':
                 await getEmployee();
@@ -116,9 +126,9 @@ const getDepartment = async function() {
     console.table(departmentList);
 }
 
-const createDepartment = async function() {
+const createDepartment = async function(newName) {
     const newDepartment = await Department.create({
-        name: 'test',
+        name: newName,
     })
 }
 
