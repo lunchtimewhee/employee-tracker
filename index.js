@@ -15,11 +15,28 @@ const mainMenuQuestions = [
         message: 'What would you like to do? ',
         choices: ['View All Employees','Add Employees','Update Employee Role','View All Roles','Add Role', 'View All Departments', 'Add Department', 'Quit'],
         name: 'mainMenuChoice'
-    },  
+    }
 ];
 
 
+const askQuestions = async function () {
+    const answers = await inquirer.prompt(mainMenuQuestions);
 
+    if (answers.mainMenuChoice === 'Quit') {
+        return answers;
+    } else {
+        
+        switch(answers.mainMenuChoice){
+            case 'View All Employees':
+                await getEmployee();
+                break;
+
+        };
+
+        
+        return askQuestions;
+    };
+};
 
 
 
@@ -71,7 +88,9 @@ const syncTables = async function() {
 }
 
 const getDepartment = async function() {
-    const departmentList = await Department.findAll();
+    const departmentList = await Department.findAll({
+        raw: true,
+    });
     console.log(JSON.stringify(departmentList,null,2));
 }
 
@@ -90,7 +109,9 @@ const createRole = async function() {
 }
 
 const getRole = async function() {
-    const roleList = await Role.findAll();
+    const roleList = await Role.findAll({
+        raw: true,
+    });
     console.log(JSON.stringify(roleList,null,2));
 }
 
@@ -113,20 +134,24 @@ const createManager = async function() {
 }
 
 const getEmployee = async function() {
-    const employeeList = await Employee.findAll();
-    console.log(JSON.stringify(employeeList,null,2));
+    const employeeList = await Employee.findAll({
+        raw:true
+    });
+
+    console.table(employeeList);
 }
 
 //syncTables();
 const seedData = async function() {
-    await createDepartment();
+    /*await createDepartment();
     await getDepartment();
     await createRole();
     await getRole();
     await createEmployee();
     await createEmployee();
-    await createManager();
+    await createManager();*/
     await getEmployee();
 }
 
-seedData();
+//seedData();
+askQuestions();
